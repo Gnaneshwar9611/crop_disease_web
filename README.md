@@ -129,9 +129,6 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-✅ Backend running at: **http://127.0.0.1:8000**  
-📋 API docs (Swagger UI): **http://127.0.0.1:8000/docs**  
-🔍 Health check: **http://127.0.0.1:8000/health**
 
 ---
 
@@ -155,7 +152,6 @@ npm install
 npm run dev
 ```
 
-✅ Frontend running at: **http://localhost:3000**
 
 ---
 
