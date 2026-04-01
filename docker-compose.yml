@@ -1,0 +1,41 @@
+services:
+
+  # ── FastAPI + TensorFlow Backend ─────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: agriscan_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount models separately so they don't need to be rebuilt
+      # Remove these two lines if you want models baked into the image
+      - ./backend/models:/app/models
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s   # TF model loading takes time
+
+  # ── Next.js Frontend ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: agriscan_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      # This URL is used inside the browser (client-side fetch).
+      # When running via Docker on your machine, the browser hits
+      # localhost:8000 which is forwarded to the backend container.
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
